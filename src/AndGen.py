@@ -1,7 +1,9 @@
 # coding: utf-8
+import os
 
 columes = []
 db_columes = []
+po_dir = '../resources/po'
 
 def readColumes():
     jfile = open("../resources/po/OrderFinanceFlowReq.java",  mode='r', encoding='UTF-8')
@@ -17,6 +19,7 @@ def readColumes():
                 .replace("\n", "")
             columes.append(colume)
 
+
 def sqlFormat():
     for colume in columes:
         rc = ''
@@ -27,12 +30,13 @@ def sqlFormat():
                 rc = rc + c
         db_columes.append(rc)
 
+
 def xmlGen():
     for i in range(len(columes)):
         tag = '<if test="%s != null">\n AND %s = #{%s}\n</if>' % (columes[i], db_columes[i], columes[i])
         print(tag)
 
+
 if __name__ == '__main__':
-    readColumes()
     sqlFormat()
     xmlGen()
