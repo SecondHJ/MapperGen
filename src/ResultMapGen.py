@@ -2,14 +2,22 @@
 
 columes = []
 db_columes = []
+classPath = ''
 
 def readColumes():
-    jfile = file("../resources/po/Product.java")
+    jfile = open("../resources/po/VehicleDisabledRecord.java",  mode='r', encoding='UTF-8')
     lines = jfile.readlines()
     for line in lines:
+        if line.find('serialVersionUID') != -1:
+            continue
+        if line.find('package') != -1:
+            classPath = line[line.find('com'): len(line) - 2]
         if line.find("private") != -1:
             strs = line.split(" ")
-            colume = strs[len(strs) - 1].replace(";", "").replace("\n", "")
+            colume = strs[len(strs) - 1]\
+                .replace(";", "")\
+                .replace("\r", "")\
+                .replace("\n", "")
             columes.append(colume)
 
 def sqlFormat():
@@ -23,12 +31,13 @@ def sqlFormat():
         db_columes.append(rc)
 
 def xmlGen():
+    print('<resultMap id="BaseResultMap" type="%s">' % classPath)
     for i in range(len(columes)):
-        tag = '<if test="%s != null">\n     %s = #{%s}\n</if>' % (columes[i], db_columes[i], columes[i])
+        tag = '<result column="%s" property="%s" />' % (db_columes[i], columes[i])
         print(tag)
+    print('</resultMap>')
 
 if __name__ == '__main__':
     readColumes()
     sqlFormat()
     xmlGen()
-    # print(db_columes)
